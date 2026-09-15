@@ -64,6 +64,6 @@ app.get('/api/download', async (req, res) => {
 
 app.get('/{*path}', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-ensureYtDlp().catch(e => console.error('yt-dlp download failed:', e.message));
+ensureYtDlp().catch(e => console.error(e.message));
 cache.init().catch(e => console.error('cache init failed:', e.message));
 app.listen(PORT, () => console.log(`Spotiby running at http://127.0.0.1:${PORT}`));
