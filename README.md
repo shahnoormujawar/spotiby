@@ -67,6 +67,14 @@ base64 -w0 cookies.txt        # Linux / Git Bash
 
 4. On Render, add an environment variable `YTDLP_COOKIES` with that string and redeploy. The log will say "YouTube cookies loaded".
 
+**Deno is also required on cloud hosts.** yt-dlp needs a JavaScript runtime to solve YouTube's stream challenge; without it downloads time out or get throttled. The included `render.yaml` installs Deno at build time. If you created the service by hand, set the build command to:
+
+```bash
+npm ci && mkdir -p bin && curl -fsSL https://github.com/denoland/deno/releases/latest/download/deno-x86_64-unknown-linux-gnu.zip -o /tmp/deno.zip && unzip -o /tmp/deno.zip -d bin && chmod +x bin/deno
+```
+
+The server also tries to download Deno on its own at startup if it is missing. Look for "Deno found" in the logs.
+
 Cookies expire after a few weeks to months; when downloads start failing with the bot-check error again, export fresh ones. Search and download both go through yt-dlp, so the cookies cover everything.
 
 If you'd rather not deal with cookies, run the server on a home machine and expose it with `npx cloudflared tunnel --url http://127.0.0.1:3000`. Home IPs are not blocked.

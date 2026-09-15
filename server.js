@@ -1,7 +1,7 @@
 require('dotenv').config();
 const path = require('path');
 const express = require('express');
-const { streamMp3, ensureYtDlp } = require('./lib/audio');
+const { streamMp3, ensureYtDlp, ensureDeno } = require('./lib/audio');
 const { parseLink, fetchPublic, enrichArt } = require('./lib/public');
 const cache = require('./lib/cache');
 
@@ -66,6 +66,6 @@ app.get('/api/download', async (req, res) => {
 
 app.get('/{*path}', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-ensureYtDlp().catch(e => console.error(e.message));
+ensureYtDlp().then(() => ensureDeno()).catch(e => console.error(e.message));
 cache.init().catch(e => console.error('cache init failed:', e.message));
 app.listen(PORT, () => console.log(`Spotiby running at http://127.0.0.1:${PORT}`));
