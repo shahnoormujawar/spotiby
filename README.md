@@ -46,7 +46,7 @@ Open the ngrok link on your phone and choose "Add to Home Screen".
 - **Scales to hundreds of songs.** Track metadata and audio live in separate stores, so listing the library never touches the audio. Audio is read only when a song plays.
 - **Background playback.** Uses the Media Session API for the Android media notification and lock screen, including a scrubber. The next song is preloaded so transitions are gapless when the screen is off.
 - **Protected storage.** Asks Chrome for persistent storage on the first download so songs are not evicted. The Saved tab shows space used.
-- **128 kbps MP3** keeps a 200-song library around 650 MB.
+- **Opus audio at about 130 kbps** keeps a 200-song library around 650 MB.
 
 ## Match cache (optional MongoDB)
 
@@ -69,7 +69,9 @@ base64 -w0 cookies.txt        # Linux / Git Bash
 
 **JavaScript runtime.** yt-dlp needs a JS runtime to solve YouTube's stream challenge. The server passes its own Node binary to yt-dlp automatically, so nothing extra is needed. Set `YTDLP_JS_RUNTIME=deno` only if you specifically want Deno.
 
-**Memory on free tiers.** Each download runs yt-dlp, a JS runtime, and ffmpeg. On a 512 MB instance two at once gets the process killed, so the server allows one download at a time by default (`MAX_DOWNLOADS`). Phones still queue several; they just wait their turn.
+**Audio format.** By default the server streams YouTube's Opus audio untouched (`AUDIO_FORMAT=direct`). No ffmpeg, almost no CPU, and Android plays it natively. Set `AUDIO_FORMAT=mp3` to transcode instead; it is universal but roughly ten times the CPU, which makes a free-tier instance take a minute or more per song.
+
+**Memory on free tiers.** Each download runs yt-dlp plus a JS runtime. `MAX_DOWNLOADS` caps how many run at once (default 2 in direct mode, 1 in mp3 mode). Phones still queue several; they wait their turn.
 
 Cookies expire after a few weeks to months; when downloads start failing with the bot-check error again, export fresh ones. Search and download both go through yt-dlp, so the cookies cover everything.
 

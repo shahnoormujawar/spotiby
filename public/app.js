@@ -259,8 +259,8 @@ async function renderDownloads() {
   const bytes = state.savedItems.reduce((n, t) => n + (t.size || 0), 0);
   $('#dl-summary').textContent = q ? `${items.length} of ${state.savedItems.length} songs` : `${state.savedItems.length} songs · ${fmtMB(bytes)}`;
   items.forEach((t, i) => {
-    const save = el('button', 't-action', ICON.save); save.title = 'Save MP3 to phone';
-    save.onclick = async () => { const a = await db.audioGet(t.id); if (!a) return; const link = document.createElement('a'); link.href = URL.createObjectURL(a.blob); link.download = `${t.artists} - ${t.name}.mp3`; link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 5000); toast('Exporting MP3'); };
+    const save = el('button', 't-action', ICON.save); save.title = 'Save audio file to phone';
+    save.onclick = async () => { const a = await db.audioGet(t.id); if (!a) return; const link = document.createElement('a'); link.href = URL.createObjectURL(a.blob); link.download = `${t.artists} - ${t.name}.${(t.mime || '').includes('webm') ? 'webm' : (t.mime || '').includes('mp4') ? 'm4a' : 'mp3'}`; link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 5000); toast('Exporting MP3'); };
     ul.append(trackRow(t, i, { extra: save, actionIcon: ICON.trash, onAction: async (tr, b) => {
       await db.deleteTrack(tr.id); state.metaById.delete(tr.id); state.saved.delete(tr.id); updateBadge();
       if (urlCache.has(tr.id)) { URL.revokeObjectURL(urlCache.get(tr.id)); urlCache.delete(tr.id); }
@@ -294,7 +294,8 @@ async function fetchTrack(t) {
   const blob = await r.blob();
   if (blob.size < 20000) throw new Error('empty audio');
   const imageBlob = state.metaById.has(t.id) ? null : await fetchCover(t.image);
-  const meta = { id: t.id, name: t.name, artists: t.artists, album: t.album || '', image: t.image || '', duration_ms: t.duration_ms, size: blob.size, savedAt: Date.now(), imageBlob };
+  const mime = r.headers.get('content-type') || blob.type || 'audio/mpeg';
+  const meta = { id: t.id, name: t.name, artists: t.artists, album: t.album || '', image: t.image || '', duration_ms: t.duration_ms, size: blob.size, savedAt: Date.now(), imageBlob, mime };
   await db.saveTrack(meta, blob);
   state.metaById.set(t.id, meta); state.saved.add(t.id); updateBadge();
   if (state.cur.id === t.id) { $('#full-save').classList.add('saved'); $('#full-save').title = 'Saved on this phone'; }

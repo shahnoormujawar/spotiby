@@ -49,10 +49,10 @@ app.get('/api/download', async (req, res) => {
   const { name, artists, duration } = req.query;
   if (!name) return res.status(400).json({ error: 'name required' });
   try {
-    const { title, stream, cleanup } = await streamMp3({ name, artists, durationMs: Number(duration) || 0 });
+    const { title, stream, cleanup, mime, ext } = await streamMp3({ name, artists, durationMs: Number(duration) || 0 });
     const safe = `${artists || ''} - ${name}`.replace(/[^\w\s\-.,()&']/g, '').trim() || 'track';
-    res.setHeader('Content-Type', 'audio/mpeg');
-    res.setHeader('Content-Disposition', `attachment; filename="${safe}.mp3"`);
+    res.setHeader('Content-Type', mime);
+    res.setHeader('Content-Disposition', `attachment; filename="${safe}.${ext}"`);
     res.setHeader('X-Source-Title', encodeURIComponent(title || ''));
     stream.pipe(res);
     res.on('close', cleanup);

@@ -15,6 +15,8 @@ services:
         sync: false
       - key: YTDLP_COOKIES
         sync: false
-      # One download at a time keeps the free 512 MB instance from being OOM-killed
+      # direct = stream YouTube's Opus audio as-is (fast, no ffmpeg). mp3 = transcode (slow on free tier).
+      - key: AUDIO_FORMAT
+        value: direct
       - key: MAX_DOWNLOADS
-        value: "1"
+        value: "2"
