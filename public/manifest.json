@@ -1,0 +1,11 @@
+{
+  "name": "Spotiby",
+  "short_name": "Spotiby",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0b0f",
+  "theme_color": "#0b0b0f",
+  "icons": [
+    { "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0b0f'/%3E%3Ccircle cx='32' cy='32' r='24' fill='%231ed760'/%3E%3Cpath d='M20 27c9-3 17-2 24 2M22 34c7-2 13-1 18 2M24 41c5-1 10 0 14 2' stroke='%230b0b0f' stroke-width='3.5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

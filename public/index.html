@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+  <meta name="theme-color" content="#0a0a0e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Spotiby</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%231ed760'/%3E%3Cpath d='M18 26c10-3 20-2 28 3M20 34c8-2 16-1 22 2M22 42c6-1 12 0 17 2' stroke='%230b0b0f' stroke-width='4' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ===== Welcome ===== -->
+    <section id="view-login" class="view hidden">
+      <div class="hero">
+        <div class="orb orb-a"></div><div class="orb orb-b"></div>
+        <div class="logo-big">
+          <svg viewBox="0 0 64 64" width="76" height="76"><circle cx="32" cy="32" r="30" fill="#1ed760"/><path d="M18 26c10-3 20-2 28 3M20 34c8-2 16-1 22 2M22 42c6-1 12 0 17 2" stroke="#0b0b0f" stroke-width="4" stroke-linecap="round" fill="none"/></svg>
+        </div>
+        <h1>Spotiby</h1>
+        <p class="lead">Any Spotify playlist, saved to your phone.<br>Listen anywhere, even offline.</p>
+
+        <form class="linkbox" id="link-form">
+          <svg class="linkbox-icon" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M3.9 12a3.1 3.1 0 0 1 3.1-3.1h4V7H7a5 5 0 0 0 0 10h4v-1.9H7A3.1 3.1 0 0 1 3.9 12zM8 13h8v-2H8zm9-6h-4v1.9h4a3.1 3.1 0 0 1 0 6.2h-4V17h4a5 5 0 0 0 0-10z"/></svg>
+          <input id="link-input" type="url" inputmode="url" placeholder="Paste a Spotify playlist link" autocomplete="off" required>
+          <button class="btn btn-primary" type="submit" id="link-btn">Open</button>
+        </form>
+
+        <ol class="steps">
+          <li><span>1</span><div>Open your playlist in Spotify and tap <b>⋯</b></div></li>
+          <li><span>2</span><div>Choose <b>Make public</b> <small>(private ones won't load)</small></div></li>
+          <li><span>3</span><div>Tap <b>Share</b> → <b>Copy link</b> and paste it above</div></li>
+        </ol>
+        <p class="hint">Album links work too. No Spotify login needed.</p>
+        <p class="credit">Made with <span class="heart">♥</span> by Shahnoor for Aditi</p>
+      </div>
+    </section>
+
+    <!-- ===== Main shell ===== -->
+    <section id="view-main" class="view hidden">
+      <header class="topbar" id="topbar">
+        <button class="icon-btn hidden" id="back-btn" aria-label="Back">
+          <svg viewBox="0 0 24 24" width="26" height="26"><path fill="currentColor" d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg>
+        </button>
+        <h2 id="title">Playlists</h2>
+        <span class="chip hidden" id="offline-chip">Offline</span>
+      </header>
+      <div class="dl-banner hidden" id="dl-banner">
+        <div class="dl-banner-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" class="ring-bg"/><circle cx="18" cy="18" r="15.5" class="ring-fg" id="dl-ring"/></svg><span id="dl-ring-pct">0%</span></div>
+        <div class="dl-banner-text"><b id="dl-banner-title">Downloading</b><span id="dl-banner-sub"></span></div>
+        <button class="link-btn hidden" id="dl-retry">Retry failed</button>
+        <button class="icon-btn" id="dl-cancel" aria-label="Cancel"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L12 13.4l-6.3 6.3-1.4-1.4L10.6 12 4.3 5.7l1.4-1.4L12 10.6l6.3-6.3z"/></svg></button>
+      </div>
+
+      <main id="content">
+        <!-- Playlists -->
+        <div id="page-playlists" class="page">
+          <form class="linkbox linkbox-inline" id="add-form">
+            <svg class="linkbox-icon" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg>
+            <input id="add-input" type="url" inputmode="url" placeholder="Add a playlist or album link" autocomplete="off" required>
+            <button class="btn btn-primary" type="submit" id="add-btn">Add</button>
+          </form>
+          <div class="grid" id="playlist-grid"></div>
+          <p class="credit credit-foot">Made with <span class="heart">♥</span> by Shahnoor for Aditi</p>
+        </div>
+
+        <!-- Playlist detail -->
+        <div id="page-tracks" class="page hidden">
+          <div class="pl-backdrop"><img id="pl-backdrop-img" alt=""></div>
+          <div class="playlist-head">
+            <img id="pl-cover" class="pl-cover" alt="">
+            <div class="pl-meta">
+              <div class="pl-name" id="pl-name"></div>
+              <div class="pl-sub" id="pl-sub"></div>
+            </div>
+          </div>
+          <div class="pl-actions">
+            <button class="btn btn-primary" id="download-all">
+              <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M5 20h14v-2H5zm7-2 5.5-5.5-1.4-1.4L13 14.2V4h-2v10.2L7.9 11.1l-1.4 1.4z"/></svg>
+              <span id="download-all-label">Download all</span>
+            </button>
+            <button class="btn btn-ghost" id="play-all"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>Play</button>
+            <button class="btn btn-ghost" id="shuffle-all"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M10.6 9.2 5.4 4 4 5.4l5.2 5.2zM14.5 4l2.05 2.05L4 18.6 5.4 20 17.95 7.45 20 9.5V4zm.3 10.1-1.4 1.4 3.15 3.15L14.5 20H20v-5.5l-2.05 2.05z"/></svg>Shuffle</button>
+          </div>
+          <ul class="tracks" id="track-list"></ul>
+        </div>
+
+        <!-- Saved -->
+        <div id="page-downloads" class="page hidden">
+          <div class="searchbox">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M15.5 14h-.8l-.3-.3A6.5 6.5 0 1 0 9.5 16a6.5 6.5 0 0 0 4.2-1.6l.3.3v.8l5 5 1.5-1.5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/></svg>
+            <input id="search-input" type="search" placeholder="Search saved songs" autocomplete="off">
+          </div>
+          <div class="dl-toolbar">
+            <div class="dl-summary" id="dl-summary"></div>
+            <button class="link-btn" id="play-saved">Play all</button>
+          </div>
+          <div class="storage hidden" id="storage"><div class="bar"><span id="storage-bar"></span></div><div class="storage-text" id="storage-text"></div></div>
+          <ul class="tracks" id="download-list"></ul>
+          <div class="empty hidden" id="dl-empty">
+            <div class="empty-art"><svg viewBox="0 0 24 24" width="44" height="44"><path fill="currentColor" d="M5 20h14v-2H5zm7-2 5.5-5.5-1.4-1.4L13 14.2V4h-2v10.2L7.9 11.1l-1.4 1.4z"/></svg></div>
+            <h3>Nothing saved yet</h3>
+            <p>Open a playlist and tap <b>Download all</b>.<br>Songs you save show up here and play offline.</p>
+          </div>
+          <p class="credit credit-foot">Made with <span class="heart">♥</span> by Shahnoor for Aditi</p>
+        </div>
+      </main>
+
+      <!-- Mini player -->
+      <div class="player hidden" id="player">
+        <div class="player-tap" id="player-open">
+          <img id="np-art" class="np-art" alt="">
+          <div class="np-meta">
+            <div class="np-name" id="np-name"></div>
+            <div class="np-artist"><span class="stream-chip hidden" id="np-stream">Streaming</span><span id="np-artist"></span></div>
+          </div>
+        </div>
+        <button class="icon-btn" id="np-prev" aria-label="Previous"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg></button>
+        <button class="icon-btn icon-btn-main" id="np-play" aria-label="Play or pause"><svg id="np-play-icon" viewBox="0 0 24 24" width="26" height="26"><path fill="currentColor" d="M8 5v14l11-7z"/></svg></button>
+        <button class="icon-btn" id="np-next" aria-label="Next"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M6 18l8.5-6L6 6zM16 6h2v12h-2z"/></svg></button>
+        <div class="np-bar"><span id="np-fill"></span></div>
+        <audio id="audio"></audio>
+      </div>
+
+      <!-- Full-screen Now Playing -->
+      <div class="full hidden" id="full">
+        <div class="full-bg"><img id="full-bg-img" alt=""></div>
+        <div class="full-inner">
+          <div class="full-top">
+            <button class="icon-btn" id="full-close" aria-label="Close"><svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z"/></svg></button>
+            <div class="full-label" id="full-label">Now playing</div>
+            <button class="icon-btn" id="full-save" aria-label="Save to phone" title="Save to phone"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M5 20h14v-2H5zm7-2 5.5-5.5-1.4-1.4L13 14.2V4h-2v10.2L7.9 11.1l-1.4 1.4z"/></svg></button>
+          </div>
+          <div class="full-art-wrap"><img id="full-art" class="full-art" alt=""></div>
+          <div class="full-meta">
+            <div class="full-name" id="full-name"></div>
+            <div class="full-artist" id="full-artist"></div>
+          </div>
+          <div class="seek">
+            <input type="range" id="seek" min="0" max="1000" value="0" aria-label="Seek">
+            <div class="seek-times"><span id="t-cur">0:00</span><span id="t-dur">0:00</span></div>
+          </div>
+          <div class="full-controls">
+            <button class="icon-btn toggle" id="shuffle-btn" aria-label="Shuffle"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M10.6 9.2 5.4 4 4 5.4l5.2 5.2zM14.5 4l2.05 2.05L4 18.6 5.4 20 17.95 7.45 20 9.5V4zm.3 10.1-1.4 1.4 3.15 3.15L14.5 20H20v-5.5l-2.05 2.05z"/></svg></button>
+            <button class="icon-btn big" id="full-prev" aria-label="Previous"><svg viewBox="0 0 24 24" width="34" height="34"><path fill="currentColor" d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg></button>
+            <button class="icon-btn icon-btn-main huge" id="full-play" aria-label="Play or pause"><svg id="full-play-icon" viewBox="0 0 24 24" width="36" height="36"><path fill="currentColor" d="M8 5v14l11-7z"/></svg></button>
+            <button class="icon-btn big" id="full-next" aria-label="Next"><svg viewBox="0 0 24 24" width="34" height="34"><path fill="currentColor" d="M6 18l8.5-6L6 6zM16 6h2v12h-2z"/></svg></button>
+            <button class="icon-btn toggle" id="repeat-btn" aria-label="Repeat"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <nav class="tabs">
+        <button class="tab active" data-tab="playlists">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M3 5h12v2H3zm0 4h12v2H3zm0 4h8v2H3zm12 0v6l5-3z"/></svg>
+          <span>Playlists</span>
+        </button>
+        <button class="tab" data-tab="downloads">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M5 20h14v-2H5zm7-2 5.5-5.5-1.4-1.4L13 14.2V4h-2v10.2L7.9 11.1l-1.4 1.4z"/></svg>
+          <span>Saved</span>
+          <i class="badge hidden" id="saved-badge"></i>
+        </button>
+      </nav>
+    </section>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
