@@ -52,6 +52,25 @@ Open the ngrok link on your phone and choose "Add to Home Screen".
 
 The server remembers which YouTube video matched each song, so repeat downloads skip the search. By default this is a JSON file in `data/`. To share the cache across deployments, set `MONGODB_URI` in `.env` to a MongoDB Atlas connection string (the free tier is plenty). The app falls back to the file if Mongo is unreachable.
 
+## Deploying to a cloud host (YouTube bot check)
+
+YouTube blocks most datacenter IPs with "Sign in to confirm you're not a bot". On your laptop this never happens; on Render, Railway, Fly, or any VPS it will. The fix is to give yt-dlp cookies from a logged-in YouTube session:
+
+1. Use a throwaway Google account, not your main one. Google may flag the account.
+2. In Chrome, log into YouTube with that account, install the "Get cookies.txt LOCALLY" extension, open youtube.com, and export cookies in Netscape format.
+3. Base64-encode the file so it fits in one environment variable:
+
+```bash
+base64 -w0 cookies.txt        # Linux / Git Bash
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("cookies.txt"))   # PowerShell
+```
+
+4. On Render, add an environment variable `YTDLP_COOKIES` with that string and redeploy. The log will say "YouTube cookies loaded".
+
+Cookies expire after a few weeks to months; when downloads start failing with the bot-check error again, export fresh ones. Search and download both go through yt-dlp, so the cookies cover everything.
+
+If you'd rather not deal with cookies, run the server on a home machine and expose it with `npx cloudflared tunnel --url http://127.0.0.1:3000`. Home IPs are not blocked.
+
 ## Limits
 
 - Spotify's public page exposes the first 50 tracks of a playlist. Albums come through in full.

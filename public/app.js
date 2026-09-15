@@ -290,7 +290,7 @@ async function ensurePersist() { try { if (navigator.storage && navigator.storag
 async function fetchTrack(t) {
   const q = new URLSearchParams({ name: t.name, artists: t.artists, duration: t.duration_ms });
   const r = await fetch(`/api/download?${q}`);
-  if (!r.ok) throw new Error(r.status === 404 ? 'no_match' : 'download failed');
+  if (!r.ok) throw new Error(r.status === 404 ? 'no_match' : r.status === 503 ? 'blocked' : 'download failed');
   const blob = await r.blob();
   if (blob.size < 20000) throw new Error('empty audio');
   const imageBlob = state.metaById.has(t.id) ? null : await fetchCover(t.image);
@@ -345,7 +345,8 @@ async function runQueue() {
         setRowStatus(item.id, 'done'); buzz(10);
       } catch (e) {
         item.attempts++;
-        if (e.message === 'no_match' || item.attempts >= MAX_ATTEMPTS) { item.status = 'failed'; d.failed++; setRowStatus(item.id, 'err'); }
+        if (e.message === 'blocked' && !d.blockedToast) { d.blockedToast = true; toast('YouTube is blocking the server. Ask the owner to add cookies.', 5000); }
+        if (e.message === 'no_match' || e.message === 'blocked' || item.attempts >= MAX_ATTEMPTS) { item.status = 'failed'; d.failed++; setRowStatus(item.id, 'err'); }
         else { item.nextAt = Date.now() + BACKOFF[item.attempts - 1]; setRowStatus(item.id, 'wait'); }
         await db.qPut(item);
       }

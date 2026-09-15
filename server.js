@@ -58,7 +58,9 @@ app.get('/api/download', async (req, res) => {
     res.on('close', cleanup);
   } catch (err) {
     console.error('download failed:', err.message);
-    if (!res.headersSent) res.status(err.message === 'no_match' || err.message === 'no_source' ? 404 : 500).json({ error: err.message });
+    if (res.headersSent) return;
+    if (err.message === 'blocked') return res.status(503).json({ error: 'blocked', message: 'YouTube is blocking this server. The owner needs to add YouTube cookies (see README).' });
+    res.status(err.message === 'no_match' || err.message === 'no_source' ? 404 : 500).json({ error: err.message });
   }
 });
 
