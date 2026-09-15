@@ -260,7 +260,7 @@ async function renderDownloads() {
   $('#dl-summary').textContent = q ? `${items.length} of ${state.savedItems.length} songs` : `${state.savedItems.length} songs · ${fmtMB(bytes)}`;
   items.forEach((t, i) => {
     const save = el('button', 't-action', ICON.save); save.title = 'Save audio file to phone';
-    save.onclick = async () => { const a = await db.audioGet(t.id); if (!a) return; const link = document.createElement('a'); link.href = URL.createObjectURL(a.blob); link.download = `${t.artists} - ${t.name}.${(t.mime || '').includes('webm') ? 'webm' : (t.mime || '').includes('mp4') ? 'm4a' : 'mp3'}`; link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 5000); toast('Exporting MP3'); };
+    save.onclick = async () => { const a = await db.audioGet(t.id); if (!a) return; const link = document.createElement('a'); link.href = URL.createObjectURL(a.blob); link.download = `${t.artists} - ${t.name}.${(t.mime || '').includes('webm') ? 'webm' : (t.mime || '').includes('mp4') ? 'm4a' : (t.mime || '').includes('aac') ? 'aac' : 'mp3'}`; link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 5000); toast('Exporting MP3'); };
     ul.append(trackRow(t, i, { extra: save, actionIcon: ICON.trash, onAction: async (tr, b) => {
       await db.deleteTrack(tr.id); state.metaById.delete(tr.id); state.saved.delete(tr.id); updateBadge();
       if (urlCache.has(tr.id)) { URL.revokeObjectURL(urlCache.get(tr.id)); urlCache.delete(tr.id); }
