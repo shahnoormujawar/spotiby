@@ -66,6 +66,6 @@ app.get('/api/download', async (req, res) => {
 
 app.get('/{*path}', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-ensureYtDlp().then(() => ensureDeno()).catch(e => console.error(e.message));
+ensureYtDlp().then(() => { if (process.env.YTDLP_JS_RUNTIME === 'deno') return ensureDeno(); console.log('JS runtime for yt-dlp: node'); }).catch(e => console.error(e.message));
 cache.init().catch(e => console.error('cache init failed:', e.message));
 app.listen(PORT, () => console.log(`Spotiby running at http://127.0.0.1:${PORT}`));

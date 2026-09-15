@@ -4,8 +4,7 @@ services:
     runtime: node
     plan: free
     region: singapore
-    # Deno is required by yt-dlp to solve YouTube's stream challenge. Installed at build time into bin/.
-    buildCommand: npm ci && mkdir -p bin && curl -fsSL https://github.com/denoland/deno/releases/latest/download/deno-x86_64-unknown-linux-gnu.zip -o /tmp/deno.zip && unzip -o /tmp/deno.zip -d bin && chmod +x bin/deno
+    buildCommand: npm ci
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
@@ -14,3 +13,8 @@ services:
         value: spotiby
       - key: MONGODB_URI
         sync: false
+      - key: YTDLP_COOKIES
+        sync: false
+      # One download at a time keeps the free 512 MB instance from being OOM-killed
+      - key: MAX_DOWNLOADS
+        value: "1"
