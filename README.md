@@ -1,3 +1,13 @@
+---
+title: Spotiby
+emoji: 🎧
+colorFrom: green
+colorTo: gray
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Spotiby
 
 Paste a Spotify playlist link, save every song to your phone, and play them offline. No Spotify login, no API keys.
@@ -51,6 +61,19 @@ Open the ngrok link on your phone and choose "Add to Home Screen".
 ## Match cache (optional MongoDB)
 
 The server remembers which YouTube video matched each song, so repeat downloads skip the search. By default this is a JSON file in `data/`. To share the cache across deployments, set `MONGODB_URI` in `.env` to a MongoDB Atlas connection string (the free tier is plenty). The app falls back to the file if Mongo is unreachable.
+
+## Deploy on Hugging Face Spaces (free, 2 CPUs)
+
+1. Create a Space at https://huggingface.co/new-space: Docker SDK, Blank template, Public or Private.
+2. In the Space's Settings, add secrets: `YTDLP_COOKIES` (see below), `MONGODB_URI` (optional), `MONGODB_DB` (optional).
+3. Push this repo to the Space:
+
+```bash
+git remote add hf https://huggingface.co/spaces/<your-username>/spotiby
+git push hf main
+```
+
+Use a Hugging Face access token with write permission as the password when prompted. The Space builds the Dockerfile and serves on port 7860. Free Spaces sleep after 48 hours without visitors and wake on the next visit.
 
 ## Deploying to a cloud host (YouTube bot check)
 
