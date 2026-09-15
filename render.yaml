@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: spotiby
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: MONGODB_DB
+        value: spotiby
+      - key: MONGODB_URI
+        sync: false
